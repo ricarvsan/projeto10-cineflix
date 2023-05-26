@@ -1,17 +1,38 @@
+import { useState, useEffect } from "react";
 import styled from "styled-components"
+import axios from "axios";
 
 export default function SeatsPage() {
+
+    const [filme, setFilme] = useState([]);
+    const [assentos, setAssentos] = useState([]);
+
+    useEffect(recebeFilme, []);
+
+    function recebeFilme() {
+        const URL = 'https://mock-api.driven.com.br/api/v8/cineflex/showtimes/1/seats';
+
+        const promisse = axios.get(URL);
+        promisse.then((resposta) => {
+            setFilme(resposta.data.movie);
+            console.log(resposta.data.movie);
+            setAssentos(resposta.data.seats);
+            console.log(assentos);
+        })      
+
+        promisse.catch((erro) => console.log(erro.response.data));
+    }
+
+    
 
     return (
         <PageContainer>
             Selecione o(s) assento(s)
 
             <SeatsContainer>
-                <SeatItem>01</SeatItem>
-                <SeatItem>02</SeatItem>
-                <SeatItem>03</SeatItem>
-                <SeatItem>04</SeatItem>
-                <SeatItem>05</SeatItem>
+                {assentos.map(assento => (
+                    <SeatItem>{assento.name}</SeatItem>
+                ))}
             </SeatsContainer>
 
             <CaptionContainer>
@@ -41,11 +62,11 @@ export default function SeatsPage() {
 
             <FooterContainer>
                 <div>
-                    <img src={"https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"} alt="poster" />
+                    <img src={filme.posterURL} alt="poster" />
                 </div>
                 <div>
-                    <p>Tudo em todo lugar ao mesmo tempo</p>
-                    <p>Sexta - 14h00</p>
+                    <p>{filme.title}</p>
+                    <p>{`Sexta - 14h00`}</p>
                 </div>
             </FooterContainer>
 
