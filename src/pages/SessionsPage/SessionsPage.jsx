@@ -1,17 +1,21 @@
 import styled from "styled-components"
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import loading from '../../assets/loading.gif';
+import { Link } from "react-router-dom";
 
 
 export default function SessionsPage() {
 
+    const parametros = useParams();
     const [filme, setFilme] = useState([]);
     const [days, setDays] = useState([]);
 
     useEffect(recebeFilme, []);
 
     function recebeFilme() {
-        const URL = `https://mock-api.driven.com.br/api/v8/cineflex/movies/1/showtimes`;
+        const URL = `https://mock-api.driven.com.br/api/v8/cineflex/movies/${parametros.idFilme}/showtimes`;
 
         const promisse = axios.get(URL);
         promisse.then((resposta) => {
@@ -19,9 +23,19 @@ export default function SessionsPage() {
             console.log(resposta.data);
             setDays(resposta.data.days);
             console.log(resposta.data.days);
-        })      
+        })
 
         promisse.catch((erro) => console.log(erro.response.data));
+    }
+
+    if (filme.length === 0) {
+        return (
+            <>
+                <PageContainer>
+                    <img src={loading} alt="carregando" />
+                </PageContainer>
+            </>
+        )
     }
 
     return (
@@ -29,12 +43,16 @@ export default function SessionsPage() {
             Selecione o horário
             <div>
                 {days.map(days => (
-                    <SessionContainer key={days.id}>
+                    <SessionContainer data-test='movie-day' key={days.id}>
                         {days.weekday} - {days.date}
 
                         <ButtonsContainer>
-                            <button key={days.showtimes[0].id}>{days.showtimes[0].name}</button>
-                            <button key={days.showtimes[1].id}>{days.showtimes[1].name}</button>
+                            <Link to={`/assentos/${days.showtimes[0].id}`}>
+                                <button data-test='showtime' key={days.showtimes[0].id}>{days.showtimes[0].name}</button>
+                            </Link>
+                            <Link to={`/assentos/${days.showtimes[1].id}`}>
+                                <button data-test='showtime' key={days.showtimes[1].id}>{days.showtimes[1].name}</button>
+                            </Link>
                         </ButtonsContainer>
 
                     </SessionContainer>
@@ -42,9 +60,9 @@ export default function SessionsPage() {
                 )}
             </div>
 
-            <FooterContainer>
+            <FooterContainer data-test='footer'>
                 <div>
-                    <img src={filme.posterURL} alt={`poster ${filme.title}`}/>
+                    <img src={filme.posterURL} alt={`poster ${filme.title}`} />
                 </div>
                 <div>
                     <p>{filme.title}</p>

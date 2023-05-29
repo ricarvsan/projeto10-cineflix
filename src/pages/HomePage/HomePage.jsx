@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components"
 import axios from "axios";
+import loading from '../../assets/loading.gif'
+import { Link } from "react-router-dom";
 
 export default function HomePage() {
 
@@ -20,14 +22,26 @@ export default function HomePage() {
         promisse.catch((erro) => console.log(erro.response.data));
     }
 
+    if (filmes.length === 0) {
+        return (
+            <>
+            <PageContainer>
+                <img src={loading} alt="carregando" />
+            </PageContainer>
+            </>
+        )
+    }
+
     return (
         <PageContainer>
             Selecione o filme
-            
+
             <ListContainer>
                 {filmes.map(filme => (
-                    <MovieContainer key={filme.id}>
-                        <img src={filme.posterURL} alt={`poster ${filme.title}`} />
+                    <MovieContainer data-test='movie' key={filme.id}>
+                        <Link to={`sessoes/${filme.id}`}>
+                            <img src={filme.posterURL} alt={`poster ${filme.title}`} />
+                        </Link>
                     </MovieContainer>
                 ))}
             </ListContainer>
@@ -46,6 +60,9 @@ const PageContainer = styled.div`
     color: #293845;
     margin-top: 30px;
     padding-top: 70px;
+    img {
+        width: 100%;
+    }
 `
 const ListContainer = styled.div`
     width: 330px;

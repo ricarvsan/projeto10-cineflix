@@ -4,18 +4,30 @@ import SeatsPage from "./pages/SeatsPage/SeatsPage"
 import SessionsPage from "./pages/SessionsPage/SessionsPage"
 import SuccessPage from "./pages/SuccessPage/SuccessPage"
 import axios from "axios"
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
 
 export default function App() {
     axios.defaults.headers.common['Authorization'] = 'V3kN1cfyyjLRNylwAWcJVAFW';
 
     return (
         <>
-           <NavContainer>CINEFLEX</NavContainer>
+            <BrowserRouter >
+                <Link to='/'>
+                    <NavContainer>CINEFLEX</NavContainer>
+                </Link>
 
-            {/* <HomePage /> */}
-            <SeatsPage />
-            {/* <SessionsPage /> */}
-            {/* <SuccessPage /> */}
+                <Routes>
+                    <Route path='/' Component={HomePage} />
+                    <Route path='/sessoes/:idFilme' Component={SessionsPage} />
+                    <Route path='/assentos/:idSessao' Component={SeatsPage} />
+                    <Route path='/sucesso' Component={SuccessPage} />
+
+                    {/* <HomePage /> */}
+                    {/* <SeatsPage /> */}
+                    {/* <SessionsPage /> */}
+                    {/* <SuccessPage /> */}
+                </Routes>
+            </BrowserRouter>
         </>
     )
 }
@@ -32,6 +44,7 @@ const NavContainer = styled.div`
     font-size: 34px;
     position: fixed;
     top: 0;
+    left: 0;
     a {
         text-decoration: none;
         color: #E8833A;
