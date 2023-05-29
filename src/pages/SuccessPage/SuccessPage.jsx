@@ -26,7 +26,9 @@ export default function SuccessPage() {
                 <p>CPF: 123.456.789-10</p>
             </TextContainer>
 
-            <button data-test='go-home-btn' Link={'/'} >Voltar para Home</button>
+            <Link to={'/'}>
+                <button data-test='go-home-btn'>Voltar para Home</button>
+            </Link>
         </PageContainer>
     )
 }
@@ -46,6 +48,15 @@ const PageContainer = styled.div`
     }
     button {
         margin-top: 50px;
+        width: 225px;
+        height: 42px;
+        border-radius: 3px;
+        border: none;
+        background-color: #E8833A;
+        color: #FFFFFF;
+        font-size: 18px;
+        font-weight: 400;
+        font-family: 'Roboto';
     }
     h1 {
         font-family: 'Roboto';

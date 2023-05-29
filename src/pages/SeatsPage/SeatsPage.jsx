@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import styled from "styled-components"
 import axios from "axios";
 import loading from '../../assets/loading.gif';
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 
 export default function SeatsPage() {
@@ -13,6 +13,10 @@ export default function SeatsPage() {
     const [horario, setHorario] = useState('');
     const [active, setActive] = useState([]);
     const parametros = useParams();
+    const [nome, setNome] = useState('');
+    const [cpf, setCpf] = useState('');
+    const regex = /^#([0-9]{11})$/;
+    const navigate = useNavigate();
 
     useEffect(recebeFilme, []);
 
@@ -42,7 +46,7 @@ export default function SeatsPage() {
     }
 
     function ativos(id, disponivel) {
-        if(disponivel) {
+        if (disponivel) {
             if (!active.includes(id)) {
                 let novoAtivos = [...active, id];
                 setActive(novoAtivos);
@@ -53,18 +57,20 @@ export default function SeatsPage() {
                 setActive(novoAtivos);
                 console.log(novoAtivos);
             }
+        } else {
+            alert('Esse assento não está disponível.')
         }
     }
 
     function selecionado(id) {
-        if(active.includes(id)) {
+        if (active.includes(id)) {
             return 'selecionado'
         }
     }
 
     function cor(id, disponivel) {
-        if(disponivel) {
-            if(active.includes(id)) {
+        if (disponivel) {
+            if (active.includes(id)) {
                 return '#1AAE9E';
             } else {
                 return '#C3CFD9';
@@ -75,8 +81,8 @@ export default function SeatsPage() {
     }
 
     function borda(id, disponivel) {
-        if(disponivel) {
-            if(active.includes(id)) {
+        if (disponivel) {
+            if (active.includes(id)) {
                 return '#0E7D71';
             } else {
                 return '#7B8B99';
@@ -86,13 +92,35 @@ export default function SeatsPage() {
         }
     }
 
+    function isCpf() {
+        if (regex.test(cpf)) {
+            alert('cpf correto')
+        } else {
+            alert('cpf incorreto')
+        }
+    }
+
+    function enviar(event) {
+        event.preventDefault();
+
+        let salvarAssentos = {
+            ids: [...active],
+            name: nome,
+            cpf: cpf
+        }
+
+        const promisse = axios.post('https://mock-api.driven.com.br/api/v8/cineflex/seats/book-many', salvarAssentos);
+        promisse.then(() => navigate('/sucesso'));
+        promisse.catch(resposta => console.log(resposta.response.data));
+    }
+
     return (
         <PageContainer>
             Selecione o(s) assento(s)
 
             <SeatsContainer>
                 {assentos.map(assento => (
-                    <SeatItem data-test='seat' key={assento.id} borda={() => borda(assento.id, assento.isAvailable)} cor={() => cor(assento.id, assento.isAvailable)}  disponivel={assento.isAvailable} onClick={() => ativos(assento.id, assento.isAvailable)} selecionado={selecionado(assento.id)}>{assento.name}</SeatItem>
+                    <SeatItem data-test='seat' key={assento.id} borda={() => borda(assento.id, assento.isAvailable)} cor={() => cor(assento.id, assento.isAvailable)} disponivel={assento.isAvailable} onClick={() => ativos(assento.id, assento.isAvailable)} selecionado={selecionado(assento.id)}>{assento.name}</SeatItem>
                 ))}
             </SeatsContainer>
 
@@ -111,15 +139,19 @@ export default function SeatsPage() {
                 </CaptionItem>
             </CaptionContainer>
 
-            <FormContainer>
-                Nome do Comprador:
-                <input data-test='client-name' placeholder="Digite seu nome..." />
+            <form onSubmit={enviar}>
+                <FormContainer >
 
-                CPF do Comprador:
-                <input data-test='client-cpf' placeholder="Digite seu CPF..." />
+                    Nome do Comprador:
+                    <input data-test='client-name' placeholder="Digite seu nome..." required value={nome} onChange={(e) => setNome(e.target.value)} />
 
-                <button data-test='book-seat-btn'>Reservar Assento(s)</button>
-            </FormContainer>
+                    CPF do Comprador:
+                    <input data-test='client-cpf' placeholder="Digite seu CPF..." required value={cpf} onChange={(e) => (setCpf(e.target.value))} />
+
+                    <button type='submit' data-test='book-seat-btn'>Reservar Assento(s)</button>
+
+                </FormContainer>
+            </form>
 
             <FooterContainer data-test='footer'>
                 <div>
@@ -175,6 +207,9 @@ const FormContainer = styled.div`
         font-weight: 400;
         border-radius: 3px;
         border: none;
+        &:hover {
+            cursor: pointer;
+        }
     }
     input {
         margin: 5px;
